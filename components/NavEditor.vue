@@ -3,13 +3,11 @@
       <a class="navbar-brand" href="/"><img width="50" src="/logo.png"/></a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active"> <router-link class="nav-link" to="/">Home</router-link></li>
-          <li class="nav-item active"> <router-link class="nav-link" to="/explore">Explore</router-link></li>
+          Writing a draft...
         </ul>
         <div class="form-inline my-2 my-lg-0">
-          <button class="btn btn-outline-success my-2 my-sm-0 mr-10" @click="write()">Write</button>
-          <button v-if="!wallet" class="btn btn-outline-success my-2 my-sm-0" @click="signIn()">Login</button>
-          <button v-else class="btn btn-outline-success my-2 my-sm-0" >{{wallet.slice(0,8)}}...</button>
+          <button class="btn btn-outline-secondary mr-2" @click="save()">Save</button>
+          <button class="btn btn-outline-success" @click="publish()">Publish</button>
         </div>
       </div>
     </nav>

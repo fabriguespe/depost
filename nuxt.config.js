@@ -1,7 +1,7 @@
 export default {
   ssr:false,
   head: {
-    title: 'depost',
+    title: 'Depost',
     htmlAttrs: {
       lang: 'en'
     },
@@ -18,11 +18,14 @@ export default {
   router: {
     base: ''
   },
-
   css: [
+    'medium-editor/dist/css/medium-editor.css',
+    'vuejs-medium-editor/src/themes/default.css',
+    'highlight.js/styles/ocean.css' //if using code highlight
   ],
   plugins: [
     '@/plugins/utils',
+    '@/plugins/medium-editor',
     '@/plugins/bootstrap-vue',
   ],
   components: true,

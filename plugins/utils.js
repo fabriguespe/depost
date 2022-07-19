@@ -65,6 +65,21 @@ export default ({ app,store,route }, inject) => {
             console.log('error:', err)
           }
         },
+        async fetchProfile(id) {
+          try {
+            const urqlClient = await this.createClient()
+            const returnedProfile = await urqlClient.query(getProfiles, { id }).toPromise();
+            const profileData = returnedProfile.data.profiles.items[0]
+            profileData.color = generateRandomColor()
+            const pubs = await urqlClient.query(getPublications, { id, limit: 50 }).toPromise()
+            return {
+              profile: profileData,
+              publications: pubs.data.publications.items
+            }
+          } catch (err) {
+            console.log('error fetching profile...', err)
+          }
+        },
         async createClient() {
           const storageData = JSON.parse(localStorage.getItem(STORAGE_KEY))
           if (storageData) {

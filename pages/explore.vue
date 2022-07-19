@@ -1,13 +1,12 @@
 <template>
   <div class="container text-center">
-    <MyNav :key="wallet" :wallet="wallet"/>
+    <MyNav/>
  
-    <h4 style="margin-top:20px;text-aling:center">Recommended for you</h4>
+    <h4 style="margin-top:20px;text-aling:center">Most liked</h4>
     <div v-if="!pubs" class="loader"></div>
     <div v-for="(pub,index) in pubs" :key="pub.id">
-      <div v-for="(post,index) in pub.publication" :key="post.id">
-          <Pub :pub="post"/>
-      </div>
+          
+          <Pub :pub="pub.metadata" />
     </div>
   </div>
 </template>
@@ -18,18 +17,15 @@
 import {  explorePublications } from '@/plugins/api'
 import MyNav from '@/components/Nav'
 import Pub from '@/components/Pub'
+import MyFooter from '@/components/Footer'
+
 export default {
   data() {
         return {
-          wallet:this.$store.state.wallet,
           pubs:null,
         }
   },
   async mounted(){
-    const accounts = await window.ethereum.request({ method: 'eth_accounts' })
-    const account = accounts[0]
-    this.wallet=account
-    this.$store.state.wallet=account
 
     await this.$util.checkMatic()
     this.explorePublications()
@@ -51,7 +47,7 @@ export default {
 
   },
   components:{
-    MyNav,Pub
+    MyNav,Pub,MyFooter
   }
 }
 </script>
