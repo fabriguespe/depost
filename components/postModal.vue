@@ -24,7 +24,7 @@
 
 import { WebBundlr } from "@bundlr-network/client"
 import {  ethers,providers } from 'ethers'
-import ABI from '@/plugins/abi'
+import LENS_ABI from '@/plugins/lens_abi'
 import { LENS_HUB_CONTRACT_ADDRESS,defaultProfile} from '@/plugins/api'
 
 export default {

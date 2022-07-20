@@ -3,58 +3,48 @@
       <a class="navbar-brand" href="/"><img width="50" src="/logo.png"/></a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          Writing a draft...
+          This draft is automagically saved while your write...
         </ul>
         <div class="form-inline my-2 my-lg-0">
-          <button class="btn btn-outline-secondary mr-2" @click="save()">Save</button>
-          <button class="btn btn-outline-success" @click="publish()">Publish</button>
+          <!--<button class="btn btn-outline-secondary mr-2" @click="save()">
+            <template v-if="loadingSave">...</template>
+            <template v-else>Save</template>
+          </button>-->
+          <button class="btn btn-outline-success" @click="publish()">
+            <template v-if="loadingPublish">...</template>
+            <template v-else>Publish</template>
+          </button>
         </div>
       </div>
     </nav>
 </template>
 
 <script>
-import { getChallenge,authenticate} from '@/plugins/api'
-import { providers } from 'ethers'
 
 export default {
   data(){
     return{
-        wallet:this.$store.state.wallet
+      loadingSave:false,
+      loadingPublish:false,
+      wallet:this.$store.state.wallet
     }
   },
   async mounted(){
-
-    const accounts = await window.ethereum.request({ method: 'eth_accounts' })
-    const account = accounts[0]
-    this.wallet=account
-    this.$store.state.wallet=account
     
+      this.$root.$on('done', () => { this.done()})
   },
   methods:{
-    write(){
-      window.location='/write'
+    async  done() {
+      this.loadingPublish=false
+      this.loadingSave=false
     },
-    async  signIn() {
-      try {
-        const accounts = await window.ethereum.send( "eth_requestAccounts" )
-        const account = accounts.result[0]
-        const urqlClient = await this.$util.createClient()
-        const response = await urqlClient.query(getChallenge, {address: account }).toPromise()
-        const provider = new providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner()
-        const signature = await signer.signMessage(response.data.challenge.text)
-        const authData = await urqlClient.mutation(authenticate, {address: account, signature}).toPromise()
-        const { accessToken, refreshToken } = authData.data.authenticate
-        const accessTokenData = this.$util.parseJwt(accessToken)
-
-        localStorage.setItem(this.$util.STORAGE_KEY, JSON.stringify({
-          accessToken, refreshToken, exp: accessTokenData.exp
-        }))
-        window.location.reload()
-      } catch (err) {
-        console.log('error: ', err)
-      }
+    async  publish() {
+      this.loadingPublish=!this.loadingPublish
+      this.$root.$emit('publishDraft')
+    },
+    async  save() {
+      this.loadingSave=!this.loadingSave
+      this.$root.$emit('saveDraft')
     }
 
   }

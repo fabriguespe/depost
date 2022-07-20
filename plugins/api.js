@@ -692,3 +692,22 @@ export const createPostTypedData = `
    }
  }
 `
+
+export const baseMetadata = {
+  version: "1.0.0",
+  image: null,
+  imageMimeType: null,
+  mainContentFocus: "TEXT",
+  contentWarning: null,
+  location: '',
+  cover_picture: '',
+  attributes: [
+    {
+      traitType: "string",
+      key: "type",
+      value: "post"
+    }
+  ],
+  media: [],
+  appId: "depost"
+}

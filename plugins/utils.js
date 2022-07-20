@@ -2,16 +2,18 @@ import Vue from 'vue'
 import { createClient } from 'urql'
 import { refresh } from '@/plugins/api'
 import {  utils } from 'ethers'
+import { LENS_HUB_CONTRACT_ADDRESS,baseMetadata,defaultProfile} from '@/plugins/api'
+import LENS_ABI from '@/plugins/lens_abi'
 
 export const APIURL = "https://api.lens.dev"
 export const STORAGE_KEY = "LH_STORAGE_KEY"
-export const basicClient = new createClient({
-  url: APIURL
-})
+export const basicClient = new createClient({url: APIURL})
 
 
 export default ({ app,store,route }, inject) => {
+    const wallet=store.state.wallet
     inject('util',{
+      
       async checkMatic(){
 
         const chainId = 137 // Polygon Mainnet
@@ -44,6 +46,48 @@ export default ({ app,store,route }, inject) => {
           }).join(''));
         
           return JSON.parse(jsonPayload);
+        },
+
+        async  uploadToIPFS(content) {
+            const metaData = {
+              content: content,
+              description:'new_post',
+              name: `Post by @${profile.handle}`,
+              external_url: `https://depost.xyz/profile/${profile.handle}`,
+              metadata_id: uuid(),
+              createdOn: new Date().toISOString(),
+              ...baseMetadata
+            }
+            const added = await client.add(JSON.stringify(metaData))
+            const uri = `https://ipfs.infura.io/ipfs/${added.path}`
+            return uri
+        },
+        async  savePost() {
+          if(!wallet)return alert('not wallet')
+          const urqlClient = await this.createClient()
+          const dd = await urqlClient.query(defaultProfile, {request:{ethereumAddress: wallet }}).toPromise()
+          
+          console.log('Pasa',wallet,dd)
+          let profile=dd.data.defaultProfile
+          console.log('Pasa',profile)
+          const contentURI = await this.uploadToIPFS()
+          const contract = new ethers.Contract(LENS_HUB_CONTRACT_ADDRESS,LENS_ABI, getSigner())
+          try {
+            const postData = {
+              profileId: profile.id,
+              contentURI,
+              collectModule: '0x23b9467334bEb345aAa6fd1545538F3d54436e96',
+              collectModuleInitData: ethers.utils.defaultAbiCoder.encode(['bool'], [true]),
+              referenceModule: '0x0000000000000000000000000000000000000000',
+              referenceModuleInitData: []
+            }
+            console.log(postData)
+            const tx = await contract.post(postData)
+            await tx.wait()
+            
+          } catch (err) {
+            console.log('error: ', err)
+          }
         },
         async refreshAuthToken() {
           const token = JSON.parse(localStorage.getItem(STORAGE_KEY))

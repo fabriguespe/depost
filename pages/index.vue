@@ -13,10 +13,7 @@
     <MyFooter/>
   </div>
 </template>
-
-
 <script>
-
 import {  getPublications, recommendProfiles } from '@/plugins/api'
 import MyNav from '@/components/Nav'
 import MyFooter from '@/components/Footer'
@@ -24,7 +21,6 @@ export default {
   data() {
         return {
           pubs:null,
-          
         }
   },
   async mounted(){
@@ -35,7 +31,6 @@ export default {
     
     async recommendProfiles() {
       try {
-
         const urqlClient = await this.$util.createClient()
         const response = await urqlClient.query(recommendProfiles).toPromise()
         const profileData = await Promise.all(response.data.recommendedProfiles.map(async profile => {
