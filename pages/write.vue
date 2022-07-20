@@ -26,7 +26,7 @@ export default {
     }, 
     methods: {
       async publishDraft(){
-        await this.$util.savePost()
+        await this.$util.savePost(this.content)
         this.$root.$emit('done')
       },
       onChange() {

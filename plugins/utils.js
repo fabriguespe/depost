@@ -11,7 +11,6 @@ export const basicClient = new createClient({url: APIURL})
 
 
 export default ({ app,store,route }, inject) => {
-    const wallet=store.state.wallet
     inject('util',{
       
       async checkMatic(){
@@ -48,7 +47,7 @@ export default ({ app,store,route }, inject) => {
           return JSON.parse(jsonPayload);
         },
 
-        async  uploadToIPFS(content) {
+        async  uploadToIPFS(profile,content) {
             const metaData = {
               content: content,
               description:'new_post',
@@ -62,15 +61,13 @@ export default ({ app,store,route }, inject) => {
             const uri = `https://ipfs.infura.io/ipfs/${added.path}`
             return uri
         },
-        async  savePost() {
+        async  savePost(content) {
+          let wallet=store.state.wallet
           if(!wallet)return alert('not wallet')
           const urqlClient = await this.createClient()
           const dd = await urqlClient.query(defaultProfile, {request:{ethereumAddress: wallet }}).toPromise()
-          
-          console.log('Pasa',wallet,dd)
           let profile=dd.data.defaultProfile
-          console.log('Pasa',profile)
-          const contentURI = await this.uploadToIPFS()
+          const contentURI = await this.uploadToIPFS(profile,content)
           const contract = new ethers.Contract(LENS_HUB_CONTRACT_ADDRESS,LENS_ABI, getSigner())
           try {
             const postData = {

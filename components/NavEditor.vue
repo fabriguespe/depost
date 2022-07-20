@@ -31,6 +31,12 @@ export default {
   },
   async mounted(){
     
+
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' })
+      const account = accounts[0]
+      this.wallet=account
+      this.$store.state.wallet=account
+      console.log(this.wallet)
       this.$root.$on('done', () => { this.done()})
   },
   methods:{
