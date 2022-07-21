@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { createClient } from 'urql'
 import { refresh } from '@/plugins/lens_api'
 import {  utils,ethers} from 'ethers'
-import { LENS_HUB_CONTRACT_ADDRESS,baseMetadata,defaultProfile,baseSources} from '@/plugins/lens_api'
+import { LENS_HUB_CONTRACT_ADDRESS,baseMetadata,defaultProfile,baseSources,getPublications,getProfile,getProfileByHandle} from '@/plugins/lens_api'
 import LENS_ABI from '@/plugins/lens_abi'
 
 export const APIURL = "https://api.lens.dev"
@@ -16,6 +16,18 @@ export const basicClient = new createClient({url: APIURL})
 export default ({ app,store,route }, inject) => {
     inject('util',{
       
+      async getHash(image) {
+    
+        try {
+            const uploadResult = await ipfs_client.add(image)
+            let uri=`https://ipfs.io/ipfs/${uploadResult.path}`
+            console.log(uri)
+            return uri
+        } catch(e) {
+            console.log(e)
+            return
+        }
+      },
       async checkMatic(){
 
         const accounts = await window.ethereum.request({ method: 'eth_accounts' })
@@ -55,13 +67,15 @@ export default ({ app,store,route }, inject) => {
           return JSON.parse(jsonPayload);
         },
 
-        async  uploadToIPFS(profile,content) {
+        async  uploadToIPFS(profile,content,title,image) {
+          console.log(await this.getHash(image))
           const metaData = {
               content: content,
-              description:'new_post',
+              description:title,
               name: `Post by @${profile.handle}`,
               external_url: `https://depost.xyz/profile/${profile.handle}`,
               metadata_id: uuid(),
+              media: [await this.getHash(image)],
               createdOn: new Date().toISOString(),
               ...baseMetadata
           }
@@ -73,14 +87,14 @@ export default ({ app,store,route }, inject) => {
           const provider = new ethers.providers.Web3Provider(window.ethereum)
           return provider.getSigner();
         },
-        async  savePost(content) {
+        async  savePost(content,title,image) {
           let wallet=store.state.wallet
           if(!wallet)return alert('not wallet')
           const urqlClient = await this.createClient()
           const dd = await urqlClient.query(defaultProfile, {request:{ethereumAddress: wallet }}).toPromise()
           let profile=dd.data.defaultProfile
 
-          const contentURI = await this.uploadToIPFS(profile,content)
+          const contentURI = await this.uploadToIPFS(profile,content,title,image)
           const contract = new ethers.Contract(LENS_HUB_CONTRACT_ADDRESS,LENS_ABI, this.getSigner())
           try {
             const postData = {
@@ -92,8 +106,8 @@ export default ({ app,store,route }, inject) => {
               referenceModuleInitData: []
             }
             console.log(postData)
-            const tx = await contract.post(postData)
             localStorage.removeItem('draft')
+            const tx = await contract.post(postData)
             window.location='/'
             await tx.wait()
             
@@ -121,17 +135,18 @@ export default ({ app,store,route }, inject) => {
             console.log('error:', err)
           }
         },
-        async fetchProfile(id) {
+        async getProfileByHandle(input,wallet) {
           try {
+            input=input.toString()
             const urqlClient = await this.createClient()
-            const returnedProfile = await urqlClient.query(getProfiles, { id }).toPromise();
-            const profileData = returnedProfile.data.profiles.items[0]
-            profileData.color = generateRandomColor()
-            const pubs = await urqlClient.query(getPublications, { profileId:id, limit: 50,sources:baseSources }).toPromise()
-            return {
-              profile: profileData,
-              publications: pubs.data.publications.items
-            }
+            let query=input.includes('lens')?getProfileByHandle:input.includes('0x')?getProfile:input=='default'?defaultProfile:''
+            let params=input.includes('lens')?{handle: input }:input.includes('0x')?{id: input }:input=='default'?{request:{ethereumAddress: store.state.wallet}}:{}
+            let dd = await urqlClient.query(query,params).toPromise()
+            let profile=dd.data.defaultProfile?dd.data.defaultProfile:dd.data.profile
+            const pub = await urqlClient.query(getPublications, { id: profile.id ,sources:baseSources}).toPromise()
+      
+            let pubs=pub.data.publications.items
+            return {publications:pubs,profile:profile}
           } catch (err) {
             console.log('error fetching profile...', err)
           }

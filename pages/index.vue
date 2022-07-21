@@ -42,6 +42,7 @@ export default {
         let profile=dd.data.defaultProfile
         const pub = await urqlClient.query(getPublications, { id: profile.id ,sources:baseSources}).toPromise()
         this.pubs=pub.data.publications.items
+        console.log(pub)
       } catch (err) {
         console.log('error fetching recommended profiles: ', err)
       }

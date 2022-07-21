@@ -2,7 +2,7 @@
     <div class="post ">
         <div class="content" >
             <small class="hand" style="font-size:10px;">{{post.metadata.name}}-{{post.createdAt}}</small>
-            <h3 class="hand" @click="gotoPost(post.id)">{{truncate(title,80)}}</h3>
+            <h3 class="hand" @click="gotoPost(post.id)">{{truncate(post.metadata.description,80)}}</h3>
             <p class="hand" @click="gotoPost(post.id)">{{removeTags(post.metadata.content)}}</p>
         </div>
         <img :src='getImage()'/>
@@ -22,7 +22,7 @@ export default {
     mounted(){
         this.title = this.post.metadata.content.replace( /<\/?h1[^>]*>/g, '').split('<')[0];
 
-
+        console.log(this.post)
     },
     methods:{
         getImage(){
