@@ -1,22 +1,25 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
       <a class="navbar-brand" href="/"><img width="50" src="/logo.png"/></a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active"> <router-link class="nav-link" to="/">Home</router-link></li>
+          <li class="nav-item active"> <router-link class="nav-link" to="/search">Search</router-link></li>
           <li class="nav-item active"> <router-link class="nav-link" to="/explore">Explore</router-link></li>
         </ul>
         <div class="form-inline my-2 my-lg-0">
-          <button class="btn btn-outline-success my-2 my-sm-0 mr-10" @click="write()">Write</button>
-          <button v-if="!wallet" class="btn btn-outline-success my-2 my-sm-0" @click="signIn()">Login</button>
-          <button v-else class="btn btn-outline-success my-2 my-sm-0" >{{wallet.slice(0,8)}}...</button>
+          <button class="btn btn-outline-success mr-10" @click="write()">Write</button>
+          <button v-if="!wallet" class="btn btn-outline-success" @click="signIn()">Login</button>
+          <button v-else class="btn btn-outline-success" >{{wallet.slice(0,8)}}...</button>
         </div>
+      </div>
       </div>
     </nav>
 </template>
 
 <script>
-import { getChallenge,authenticate} from '@/plugins/api'
+import { getChallenge,authenticate} from '@/plugins/lens_api'
 import { providers } from 'ethers'
 
 export default {
@@ -63,6 +66,22 @@ export default {
 }
 </script>
 <style >
+.navbar{
+  margin-bottom: 40px;
+}
+.navbar::after{
+  margin-bottom: 40px;
+      height: 4px;
+    position: absolute;
+    top: 100%;
+    right: 0px;
+    left: 0px;
+    background: linear-gradient(rgba(9, 30, 66, 0.13) 0px, rgba(9, 30, 66, 0.13) 1px, rgba(9, 30, 66, 0.08) 1px, rgba(9, 30, 66, 0) 4px);
+    content: "";
+}
+.bg-light{
+  background-color: white !important;
+}
 .nuxt-link-exact-active{
   font-weight: bold;
 }
@@ -80,7 +99,5 @@ export default {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-.navbar{
-  margin-bottom: 40px;
-}
+
 </style>

@@ -1,12 +1,15 @@
-import Vue from 'vue'
+
+import { v4 as uuid } from 'uuid'
 import { createClient } from 'urql'
-import { refresh } from '@/plugins/api'
-import {  utils } from 'ethers'
-import { LENS_HUB_CONTRACT_ADDRESS,baseMetadata,defaultProfile} from '@/plugins/api'
+import { refresh } from '@/plugins/lens_api'
+import {  utils,ethers} from 'ethers'
+import { LENS_HUB_CONTRACT_ADDRESS,baseMetadata,defaultProfile,baseSources} from '@/plugins/lens_api'
 import LENS_ABI from '@/plugins/lens_abi'
 
 export const APIURL = "https://api.lens.dev"
 export const STORAGE_KEY = "LH_STORAGE_KEY"
+import { create } from 'ipfs-http-client'
+const ipfs_client = create('https://ipfs.infura.io:5001/api/v0')
 export const basicClient = new createClient({url: APIURL})
 
 
@@ -14,6 +17,11 @@ export default ({ app,store,route }, inject) => {
     inject('util',{
       
       async checkMatic(){
+
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' })
+        const account = accounts[0]
+        store.state.wallet=account
+        
 
         const chainId = 137 // Polygon Mainnet
         if (window.ethereum.networkVersion !== chainId) {
@@ -48,7 +56,7 @@ export default ({ app,store,route }, inject) => {
         },
 
         async  uploadToIPFS(profile,content) {
-            const metaData = {
+          const metaData = {
               content: content,
               description:'new_post',
               name: `Post by @${profile.handle}`,
@@ -56,10 +64,14 @@ export default ({ app,store,route }, inject) => {
               metadata_id: uuid(),
               createdOn: new Date().toISOString(),
               ...baseMetadata
-            }
-            const added = await client.add(JSON.stringify(metaData))
-            const uri = `https://ipfs.infura.io/ipfs/${added.path}`
-            return uri
+          }
+          const added = await ipfs_client.add(JSON.stringify(metaData))
+          const uri = `https://ipfs.infura.io/ipfs/${added.path}`
+          return uri
+        },
+        getSigner() {
+          const provider = new ethers.providers.Web3Provider(window.ethereum)
+          return provider.getSigner();
         },
         async  savePost(content) {
           let wallet=store.state.wallet
@@ -67,8 +79,9 @@ export default ({ app,store,route }, inject) => {
           const urqlClient = await this.createClient()
           const dd = await urqlClient.query(defaultProfile, {request:{ethereumAddress: wallet }}).toPromise()
           let profile=dd.data.defaultProfile
+
           const contentURI = await this.uploadToIPFS(profile,content)
-          const contract = new ethers.Contract(LENS_HUB_CONTRACT_ADDRESS,LENS_ABI, getSigner())
+          const contract = new ethers.Contract(LENS_HUB_CONTRACT_ADDRESS,LENS_ABI, this.getSigner())
           try {
             const postData = {
               profileId: profile.id,
@@ -80,6 +93,8 @@ export default ({ app,store,route }, inject) => {
             }
             console.log(postData)
             const tx = await contract.post(postData)
+            localStorage.removeItem('draft')
+            window.location='/'
             await tx.wait()
             
           } catch (err) {
@@ -112,7 +127,7 @@ export default ({ app,store,route }, inject) => {
             const returnedProfile = await urqlClient.query(getProfiles, { id }).toPromise();
             const profileData = returnedProfile.data.profiles.items[0]
             profileData.color = generateRandomColor()
-            const pubs = await urqlClient.query(getPublications, { id, limit: 50 }).toPromise()
+            const pubs = await urqlClient.query(getPublications, { profileId:id, limit: 50,sources:baseSources }).toPromise()
             return {
               profile: profileData,
               publications: pubs.data.publications.items

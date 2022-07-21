@@ -46,6 +46,7 @@ export default {
     },
     async  publish() {
       this.loadingPublish=!this.loadingPublish
+      
       this.$root.$emit('publishDraft')
     },
     async  save() {

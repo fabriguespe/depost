@@ -2,8 +2,10 @@
   <body>
     <MyNav />
     <div class="container text-center">
-      <h4>Latest posts</h4>
-      <div v-if="!pubs" class="loader"></div>
+      <h4>Search</h4>
+      <input v-on:keyup.enter="onEnter"  class="search" placeholder="Search for content" v-model="query"/>
+      <div v-if="loading" class="loader"></div>
+      <div v-else-if="pubs.length==0" class="">No results found</div>
       <div v-for="(pub,index) in pubs" :key="pub.id">
         <Pub :pub="pub" />
       </div>
@@ -15,14 +17,16 @@
 
 <script>
 
-import {  getPublications, defaultProfile,baseSources } from '@/plugins/lens_api'
+import {  searchPublications, baseSources } from '@/plugins/lens_api'
 import MyNav from '@/components/Nav'
 import MyFooter from '@/components/Footer'
 export default {
   data() {
         return {
-          pubs:null,
+          loading:false,
+          pubs:[],
           wallet:this.$store.state.wallet,
+          query:""
           
         }
   },
@@ -30,18 +34,18 @@ export default {
 
     
     await this.$util.checkMatic()
-    this.latestPosts()
   },
   methods:{
-    
-    async latestPosts() {
+    async onEnter() {
       try {
         let dis=this
+        this.loading=true
         const urqlClient = await this.$util.createClient()
-        const dd = await urqlClient.query(defaultProfile, {request:{ethereumAddress: dis.$store.state.wallet }}).toPromise()
-        let profile=dd.data.defaultProfile
-        const pub = await urqlClient.query(getPublications, { id: profile.id ,sources:baseSources}).toPromise()
-        this.pubs=pub.data.publications.items
+        const pub = await urqlClient.query(searchPublications, { query:dis.query ,sources:baseSources}).toPromise()
+        console.log(pub.data.search.items)
+        this.pubs=pub.data.search.items
+        
+        this.loading=false
       } catch (err) {
         console.log('error fetching recommended profiles: ', err)
       }
@@ -57,5 +61,10 @@ export default {
 
 h4{
   margin-bottom: 40px;
+}
+.search{
+  width:60%;
+  margin: 0 auto;
+  margin-bottom: 40px;;
 }
 </style>

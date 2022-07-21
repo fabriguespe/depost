@@ -17,7 +17,6 @@
 
 <script>
 
-import {  getPublications, recommendProfiles } from '@/plugins/api'
 import MyNav from '@/components/Nav'
 import MyFooter from '@/components/Footer'
 export default {
@@ -35,8 +34,6 @@ export default {
     
     async getProfile(){
         try {
-          const { profile: profileData, publications: publicationData } = await utils.fetchProfile(id)
-          
         } catch (err) {
           console.log('error fetching profile...', err)
         }
