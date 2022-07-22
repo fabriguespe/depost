@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-[Check out the demo app](https://depost-eight.vercel.app/)
+[Check out the demo app](https://depost.vercel.app/)
 
 ## Article
 

@@ -13,9 +13,6 @@
 </template>
 
 <script>
-import { create } from 'ipfs-http-client'
-const ipfs_client = create('https://ipfs.infura.io:5001/api/v0')
-
 import MyNav from '@/components/NavEditor'
 export default {
     data() {

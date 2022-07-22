@@ -669,9 +669,6 @@ fragment CommentMirrorOfFields on Comment {
   }
 }`
 
-
-
-
 export const defaultProfile = `
   query($request: DefaultProfileRequest!) {
     defaultProfile(request: $request) {
@@ -1383,119 +1380,6 @@ export const getProfiles = `
       }
     }
   }
-`
-
-
-export const recommendProfiles = `
-  query RecommendedProfiles {
-    recommendedProfiles {
-        id
-        name
-        picture {
-          ... on MediaSet {
-            original {
-              url
-            }
-          }
-        }
-        handle
-        stats {
-          totalFollowers
-        }
-    }
-  }
-`
-
-export const searchProfiles = `
-  query Search($query: Search!, $type: SearchRequestTypes!) {
-    search(request: {
-      query: $query,
-      type: $type,
-      limit: 10
-    }) {
-      ... on ProfileSearchResult {
-        __typename 
-        items {
-          ... on Profile {
-            ...ProfileFields
-          }
-        }
-        pageInfo {
-          prev
-          totalCount
-          next
-        }
-      }
-    }
-  }
-  fragment MediaFields on Media {
-    url
-  }
-  fragment ProfileFields on Profile {
-    profileId: id,
-    name
-    bio
-    attributes {
-      displayType
-      traitType
-      key
-      value
-    }
-    metadata
-    isDefault
-    handle
-    picture {
-      ... on NftImage {
-        contractAddress
-        tokenId
-        uri
-        verified
-      }
-      ... on MediaSet {
-        original {
-          ...MediaFields
-        }
-      }
-    }
-    stats {
-      totalFollowers
-      totalFollowing
-    }
-  }
-`
-
-
-export const createPostTypedData = `
-  mutation($request: CreatePublicPostRequest!) { 
-    createPostTypedData(request: $request) {
-      id
-      expiresAt
-      typedData {
-        types {
-          PostWithSig {
-            name
-            type
-          }
-        }
-      domain {
-        name
-        chainId
-        version
-        verifyingContract
-      }
-      value {
-        nonce
-        deadline
-        profileId
-        contentURI
-        collectModule
-        collectModuleInitData
-        referenceModule
-        referenceModuleInitData
-      }
-     }
-   }
- }
 `
 
 export const baseMetadata = {
