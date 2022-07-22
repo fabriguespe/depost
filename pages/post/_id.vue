@@ -32,7 +32,7 @@ export default {
       const pub = await urqlClient.query(getPublication, { id: id.toString()  }).toPromise()
   
       this.content=pub.data.publication.metadata.content
-      this.title=pub.data.publication.metadata.description
+      this.title=pub.data.publication.metadata.name
       this.image=pub.data.publication.metadata.media[0]
       this.loading=false
     }, 

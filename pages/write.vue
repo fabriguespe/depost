@@ -3,7 +3,7 @@
     <MyNav />
     <div class="container write ">
         <div v-if="draft">
-          <img :src="image"/>
+          <img :src="imageURL"/>
           <input type="file" @change="onChangeFile"  ref="file" accept="file_extension|audio/*|video/*|image/*|media_type">
           <input type="text"  v-model="title"   class="title" placeholder="The title goes here"/>
         </div>
@@ -22,6 +22,7 @@ export default {
         return {
             title:'',
             image:'',
+            imageURL:'',
             content:'',
             draft:localStorage.getItem('draft')?JSON.parse(localStorage.getItem('draft')):{content:'',title:'',image:''},
             options: {
@@ -32,7 +33,6 @@ export default {
         }
     },
     async mounted(){
-
       await this.$util.checkMatic()
       if(localStorage.getItem('draft')){
         console.log(localStorage.getItem('draft'))
@@ -43,16 +43,16 @@ export default {
       this.$root.$on('publishDraft', () => { this.publishDraft() })
     }, 
     methods: {
-      
       async publishDraft(){
         await this.$util.savePost(this.content,this.title,this.image)
         this.$root.$emit('done')
       },
       onChangeFile() {
-        let imgFile = this.$refs.file.files[0];
-        if(imgFile)this.image = URL.createObjectURL(imgFile);
-        this.onChange()
-
+        if(this.$refs.file.files[0]){
+          this.image = this.$refs.file.files[0];
+          this.imageURL = URL.createObjectURL(this.image);
+          this.onChange()
+        }
       },
       onChange() {
         localStorage.setItem('draft',JSON.stringify({content:this.content,title:this.title,image:this.image}))

@@ -16,10 +16,10 @@ export const basicClient = new createClient({url: APIURL})
 export default ({ app,store,route }, inject) => {
     inject('util',{
       
-      async getHash(image) {
+      async getHash(file) {
     
         try {
-            const uploadResult = await ipfs_client.add(image)
+            const uploadResult = await ipfs_client.add(file)
             let uri=`https://ipfs.io/ipfs/${uploadResult.path}`
             console.log(uri)
             return uri
@@ -67,13 +67,13 @@ export default ({ app,store,route }, inject) => {
           return JSON.parse(jsonPayload);
         },
 
-        async  uploadToIPFS(profile,content,title,image) {
+        async  uploadToIPFS(profile,content,title,file) {
           const metaData = {
               content: content,
               name:title,
               description: `Post by @${profile.handle}`,
               metadata_id: uuid(),
-              media: [{item:await this.getHash(image),type:'image/png'}],
+              media: [{item:await this.getHash(file),type:'image/png'}],
               createdOn: new Date().toISOString(),
               ...baseMetadata
           }
@@ -86,14 +86,14 @@ export default ({ app,store,route }, inject) => {
           const provider = new ethers.providers.Web3Provider(window.ethereum)
           return provider.getSigner();
         },
-        async  savePost(content,title,image) {
+        async  savePost(content,title,file) {
           let wallet=store.state.wallet
           if(!wallet)return alert('not wallet')
           const urqlClient = await this.createClient()
           const dd = await urqlClient.query(defaultProfile, {request:{ethereumAddress: wallet }}).toPromise()
           let profile=dd.data.defaultProfile
 
-          const contentURI = await this.uploadToIPFS(profile,content,title,image)
+          const contentURI = await this.uploadToIPFS(profile,content,title,file)
           const contract = new ethers.Contract(LENS_HUB_CONTRACT_ADDRESS,LENS_ABI, this.getSigner())
           try {
             const postData = {
