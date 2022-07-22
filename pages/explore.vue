@@ -37,7 +37,6 @@ export default {
         const response = await urqlClient.query(explorePublications,{publicationTypes: ["POST"],sources:baseSources}).toPromise()
         this.pubs=response.data.explorePublications.items
 
-        console.log(this.pubs)
       } catch (err) {
         console.log('error fetching recommended profiles: ', err)
       }

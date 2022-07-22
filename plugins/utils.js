@@ -68,7 +68,6 @@ export default ({ app,store,route }, inject) => {
         },
 
         async  uploadToIPFS(profile,content,title,image) {
-          console.log(await this.getHash(image))
           const metaData = {
               content: content,
               description:title,
@@ -141,10 +140,10 @@ export default ({ app,store,route }, inject) => {
             const urqlClient = await this.createClient()
             let query=input.includes('lens')?getProfileByHandle:input.includes('0x')?getProfile:input=='default'?defaultProfile:''
             let params=input.includes('lens')?{handle: input }:input.includes('0x')?{id: input }:input=='default'?{request:{ethereumAddress: store.state.wallet}}:{}
+    
             let dd = await urqlClient.query(query,params).toPromise()
             let profile=dd.data.defaultProfile?dd.data.defaultProfile:dd.data.profile
             const pub = await urqlClient.query(getPublications, { id: profile.id ,sources:baseSources}).toPromise()
-      
             let pubs=pub.data.publications.items
             return {publications:pubs,profile:profile}
           } catch (err) {

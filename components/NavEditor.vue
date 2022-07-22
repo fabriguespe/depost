@@ -1,7 +1,7 @@
 <template>
 <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container">
-        <a class="navbar-brand" href="/"><img width="50" src="/logo.png"/></a>
+        <a class="navbar-brand" href="/">🌿</a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             This draft is automagically saved while your write...
@@ -41,7 +41,6 @@ export default {
       const account = accounts[0]
       this.wallet=account
       this.$store.state.wallet=account
-      console.log(this.wallet)
       this.$root.$on('done', () => { this.done()})
   },
   methods:{

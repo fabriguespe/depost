@@ -29,7 +29,7 @@ export default {
         let id=this.$route.params.id
         const urqlClient = await this.$util.createClient()
         const pub = await urqlClient.query(getPublication, { id: id.toString()  }).toPromise()
-        console.log(pub.data.publication)
+    
         this.content=pub.data.publication.metadata.content
         this.title=pub.data.publication.metadata.description
         this.image=pub.data.publication.metadata.media[0]

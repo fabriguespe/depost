@@ -1,7 +1,7 @@
 <template>
     <div class="post ">
         <div class="content" >
-            <small class="hand" style="font-size:10px;">{{post.metadata.name}}-{{post.createdAt}}</small>
+            <small class="hand" @click="gotoProfile(post.id)" style="font-size:10px;">{{post.metadata.name}}-{{post.createdAt}}</small>
             <h3 class="hand" @click="gotoPost(post.id)">{{truncate(post.metadata.description,80)}}</h3>
             <p class="hand" @click="gotoPost(post.id)">{{removeTags(post.metadata.content)}}</p>
         </div>
@@ -21,8 +21,7 @@ export default {
     },
     mounted(){
         this.title = this.post.metadata.content.replace( /<\/?h1[^>]*>/g, '').split('<')[0];
-
-        console.log(this.post)
+        
     },
     methods:{
         getImage(){
@@ -32,6 +31,12 @@ export default {
         },
         truncate(str, n){
             return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+        },
+        gotoProfile(post_id){
+            //Post id contains 2 id's separated by a slash -
+            //We will split and only get the first id, which is for the profile
+            let id=post_id.split('-')[0]
+            window.location.href='/profile/'+id
         },
         gotoPost(id){
         

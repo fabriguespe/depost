@@ -42,7 +42,7 @@ export default {
         this.loading=true
         const urqlClient = await this.$util.createClient()
         const pub = await urqlClient.query(searchPublications, { query:dis.query ,sources:baseSources}).toPromise()
-        console.log(pub.data.search.items)
+
         this.pubs=pub.data.search.items
         
         this.loading=false

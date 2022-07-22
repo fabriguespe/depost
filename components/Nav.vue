@@ -1,7 +1,7 @@
 <template>
 <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container">
-      <a class="navbar-brand" href="/"><img width="50" src="/logo.png"/></a>
+      <a class="navbar-brand" href="/">🌿</a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active"> <router-link class="nav-link" to="/">Home</router-link></li>
