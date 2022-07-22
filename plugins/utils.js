@@ -70,14 +70,14 @@ export default ({ app,store,route }, inject) => {
         async  uploadToIPFS(profile,content,title,image) {
           const metaData = {
               content: content,
-              description:title,
-              name: `Post by @${profile.handle}`,
-              external_url: `https://depost.xyz/profile/${profile.handle}`,
+              name:title,
+              description: `Post by @${profile.handle}`,
               metadata_id: uuid(),
-              media: [await this.getHash(image)],
+              media: [{item:await this.getHash(image),type:'image/png'}],
               createdOn: new Date().toISOString(),
               ...baseMetadata
           }
+          console.log(metaData)
           const added = await ipfs_client.add(JSON.stringify(metaData))
           const uri = `https://ipfs.infura.io/ipfs/${added.path}`
           return uri

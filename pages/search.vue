@@ -32,7 +32,6 @@ export default {
   },
   async mounted(){
 
-    
     await this.$util.checkMatic()
   },
   methods:{
@@ -40,9 +39,11 @@ export default {
       try {
         let dis=this
         this.loading=true
+        this.pubs=[]
         const urqlClient = await this.$util.createClient()
-        const pub = await urqlClient.query(searchPublications, { query:dis.query ,sources:baseSources}).toPromise()
 
+        //Currently we can only search tags in lens protocol. Search is actively being developed.
+        const pub = await urqlClient.query(searchPublications, { query:dis.query ,sources:baseSources}).toPromise()
         this.pubs=pub.data.search.items
         
         this.loading=false

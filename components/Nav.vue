@@ -4,9 +4,8 @@
       <a class="navbar-brand" href="/">🌿</a>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active"> <router-link class="nav-link" to="/">Home</router-link></li>
+          <li class="nav-item active"> <router-link class="nav-link" to="/">Feed</router-link></li>
           <li class="nav-item active"> <router-link class="nav-link" to="/search">Search</router-link></li>
-          <li class="nav-item active"> <router-link class="nav-link" to="/explore">Explore</router-link></li>
         </ul>
         <div class="form-inline my-2 my-lg-0">
           <button class="btn btn-outline-success " style="margin-right:20px;" @click="write()">✍🏻</button>

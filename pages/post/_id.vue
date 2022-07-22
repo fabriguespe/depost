@@ -25,15 +25,16 @@ export default {
         }
     },
     async mounted(){
-        this.loading=true
-        let id=this.$route.params.id
-        const urqlClient = await this.$util.createClient()
-        const pub = await urqlClient.query(getPublication, { id: id.toString()  }).toPromise()
-    
-        this.content=pub.data.publication.metadata.content
-        this.title=pub.data.publication.metadata.description
-        this.image=pub.data.publication.metadata.media[0]
-        this.loading=false
+      await this.$util.checkMatic()
+      this.loading=true
+      let id=this.$route.params.id
+      const urqlClient = await this.$util.createClient()
+      const pub = await urqlClient.query(getPublication, { id: id.toString()  }).toPromise()
+  
+      this.content=pub.data.publication.metadata.content
+      this.title=pub.data.publication.metadata.description
+      this.image=pub.data.publication.metadata.media[0]
+      this.loading=false
     }, 
     methods: {
     },

@@ -31,7 +31,9 @@ export default {
             }
         }
     },
-    mounted(){
+    async mounted(){
+
+      await this.$util.checkMatic()
       if(localStorage.getItem('draft')){
         console.log(localStorage.getItem('draft'))
         this.draft=JSON.parse(localStorage.getItem('draft'))
@@ -55,7 +57,6 @@ export default {
       onChange() {
         localStorage.setItem('draft',JSON.stringify({content:this.content,title:this.title,image:this.image}))
 
-        console.log(localStorage.getItem('draft'))
       },
       uploadCallback(url) {
 

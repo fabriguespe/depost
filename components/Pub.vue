@@ -1,8 +1,8 @@
 <template>
     <div class="post ">
         <div class="content" >
-            <small class="hand" @click="gotoProfile(post.id)" style="font-size:10px;">{{post.metadata.name}}-{{post.createdAt}}</small>
-            <h3 class="hand" @click="gotoPost(post.id)">{{truncate(post.metadata.description,80)}}</h3>
+            <small class="hand" @click="gotoProfile(post.id)" style="font-size:10px;">{{post.metadata.description}}-{{post.createdAt}}</small>
+            <h3 class="hand" @click="gotoPost(post.id)">{{truncate(post.metadata.name,80)}}</h3>
             <p class="hand" @click="gotoPost(post.id)">{{removeTags(post.metadata.content)}}</p>
         </div>
         <img :src='getImage()'/>
