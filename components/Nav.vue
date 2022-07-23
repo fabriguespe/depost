@@ -9,7 +9,7 @@
         </ul>
         <div class="form-inline my-2 my-lg-0">
           <button class="btn btn-outline-success " style="margin-right:20px;" @click="write()">✍🏻</button>
-          <button v-if="!wallet" class="btn btn-outline-secondary" @click="$util.signIn(false)">Login</button>
+          <button v-if="!wallet" class="btn btn-outline-secondary" @click="$util.signIn(true)">Login</button>
           <button v-else class="btn btn-outline-secondary" @click="gotoProfile()" >{{wallet.slice(0,8)}}...</button>
         </div>
       </div>
