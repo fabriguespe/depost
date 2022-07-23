@@ -3,17 +3,17 @@
 To run this project:
 
 ```sh
-git clone git@github.com:dabit3/bundlr-arweave-example.git
-cd bundlr-arweave-example
-npm install
-npm run dev
+git clone git@github.com:fguespe/depost.git
+cd depost
+yarn 
+yarn dev
 ```
 
 [Check out the demo app](https://depost.vercel.app/)
 
 ## Article
 
-[Create a social dapp with Lens, Arweave, Bundlr and Nuxtjs](https://mirror.xyz/0x7E0b0363404751346930AF92C80D1fef932Cc48a/xUYFpby76cHJcW8S-d6fHGNQXAZxvpgRgXzzuD8-Dpo).
+[Building a decentralized blog in Lens Part 1](https://medium.com/@fguespe/building-a-decentralized-blog-in-lens-a95c450b1367).
 
 ## Contact
 
