@@ -9,7 +9,7 @@
         </ul>
         <div class="form-inline my-2 my-lg-0">
           <button class="btn btn-outline-success " style="margin-right:20px;" @click="write()">✍🏻</button>
-          <button v-if="!wallet" class="btn btn-outline-secondary" @click="signIn()">Login</button>
+          <button v-if="!wallet" class="btn btn-outline-secondary" @click="$util.signIn(false)">Login</button>
           <button v-else class="btn btn-outline-secondary" @click="gotoProfile()" >{{wallet.slice(0,8)}}...</button>
         </div>
       </div>
@@ -18,9 +18,6 @@
 </template>
 
 <script>
-import { getChallenge,authenticate} from '@/plugins/lens_api'
-import { providers } from 'ethers'
-
 export default {
   data(){
     return{
@@ -29,11 +26,7 @@ export default {
   },
   async mounted(){
 
-    const accounts = await window.ethereum.request({ method: 'eth_accounts' })
-    const account = accounts[0]
-    this.wallet=account
-    this.$store.state.wallet=account
-    
+
   },
   methods:{
     gotoProfile(){
@@ -41,27 +34,6 @@ export default {
     },
     write(){
       window.location='/write'
-    },
-    async  signIn() {
-      try {
-        const accounts = await window.ethereum.send( "eth_requestAccounts" )
-        const account = accounts.result[0]
-        const urqlClient = await this.$util.createClient()
-        const response = await urqlClient.query(getChallenge, {address: account }).toPromise()
-        const provider = new providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner()
-        const signature = await signer.signMessage(response.data.challenge.text)
-        const authData = await urqlClient.mutation(authenticate, {address: account, signature}).toPromise()
-        const { accessToken, refreshToken } = authData.data.authenticate
-        const accessTokenData = this.$util.parseJwt(accessToken)
-
-        localStorage.setItem(this.$util.STORAGE_KEY, JSON.stringify({
-          accessToken, refreshToken, exp: accessTokenData.exp
-        }))
-        window.location.reload()
-      } catch (err) {
-        console.log('error: ', err)
-      }
     }
 
   }

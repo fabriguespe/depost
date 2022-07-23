@@ -5,7 +5,11 @@ export const LENS_HUB_CONTRACT_ADDRESS = "0xDb46d1Dc155634FbC732f92E853b10B288AD
 const APIURL = "https://api.lens.dev"
 
 export const client = new createClient({ url: APIURL})
-
+export const hidePublication = `
+mutation HidePublication ($id: InternalPublicationId!){
+  hidePublication(request: { publicationId: $id })
+}
+`
 export const explorePublications = `
 query ExplorePublications($sources: [Sources!], $limit: LimitScalar) {
   explorePublications(request: {
@@ -793,6 +797,7 @@ query Publication($id: InternalPublicationId!)  {
 	publication(request: { publicationId: $id } ) {
    __typename 
     ... on Post {
+      hidden
       ...PostFields
     }
     ... on Comment {

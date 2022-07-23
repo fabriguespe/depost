@@ -21,6 +21,7 @@ import {  searchPublications, baseSources } from '@/plugins/lens_api'
 import MyNav from '@/components/Nav'
 import MyFooter from '@/components/Footer'
 export default {
+  middleware: 'auth',
   data() {
         return {
           loading:false,
@@ -32,7 +33,6 @@ export default {
   },
   async mounted(){
 
-    await this.$util.checkMatic()
   },
   methods:{
     async onEnter() {

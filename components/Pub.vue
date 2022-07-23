@@ -6,11 +6,13 @@
             <p class="hand" @click="gotoPost(post.id)">{{removeTags(post.metadata.content)}}</p>
         </div>
         <img :src='getImage()'/>
+        <small class="hand" v-if="isOwner" @click="hide()">Hide</small>
     </div>
 </template>
 
 
 <script>
+
 export default {
     props:['pub'],
     data() {
@@ -24,6 +26,10 @@ export default {
         
     },
     methods:{
+        async hide(){
+            await this.$util.hidePublication(this.post.id);
+            alert('done')
+        },
         getImage(){
             let media=this.post.metadata.media
             if(media[0] && media[0].original && media[0].original.mimeType.includes('image'))return media[0].original.url
@@ -51,6 +57,11 @@ export default {
             str=this.truncate(str,250)
             return str
         }
+    } ,
+    computed:{
+        isOwner(){
+            return(this.$route.path.includes('profile')) 
+        },
     }
 }
 </script>

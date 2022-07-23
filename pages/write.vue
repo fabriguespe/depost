@@ -15,6 +15,7 @@
 <script>
 import MyNav from '@/components/NavEditor'
 export default {
+  middleware: 'auth',
     data() {
         return {
             title:'',
@@ -30,9 +31,7 @@ export default {
         }
     },
     async mounted(){
-      await this.$util.checkMatic()
       if(localStorage.getItem('draft')){
-        console.log(localStorage.getItem('draft'))
         this.draft=JSON.parse(localStorage.getItem('draft'))
         this.content=this.draft.content
         this.title=this.draft.title

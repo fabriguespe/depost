@@ -17,6 +17,7 @@
 import {  getPublication } from '@/plugins/lens_api'
 import MyNav from '@/components/Nav'
 export default {
+  middleware: 'auth',
     data() {
         return {
             post:'',
@@ -24,7 +25,6 @@ export default {
         }
     },
     async mounted(){
-      await this.$util.checkMatic()
       this.loading=true
       //Let's find the publication using a query and the ID we get from the url.
       let id=this.$route.params.id

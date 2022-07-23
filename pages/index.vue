@@ -17,6 +17,7 @@ import {  explorePublications, baseSources } from '@/plugins/lens_api'
 import MyNav from '@/components/Nav'
 import MyFooter from '@/components/Footer'
 export default {
+  middleware: 'auth',
   data() {
         return {
           pubs:null,
@@ -27,7 +28,6 @@ export default {
   async mounted(){
 
     
-    await this.$util.checkMatic()
     this.latestPosts()
   },
   methods:{
@@ -37,7 +37,6 @@ export default {
         const urqlClient = await this.$util.createClient()
         const response = await urqlClient.query(explorePublications,{sources:baseSources,limit:10}).toPromise()
         this.pubs=response.data.explorePublications.items
-        console.log(this.pubs)
       } catch (err) {
         console.log('error fetching recommended profiles: ', err)
       }

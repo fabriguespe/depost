@@ -3,12 +3,24 @@ import { v4 as uuid } from 'uuid'
 import { createClient } from 'urql'
 import { refresh } from '@/plugins/lens_api'
 import {  utils,ethers} from 'ethers'
-import { LENS_HUB_CONTRACT_ADDRESS,baseMetadata,defaultProfile,baseSources,getPublications,getProfile,getProfileByHandle} from '@/plugins/lens_api'
+import { 
+LENS_HUB_CONTRACT_ADDRESS
+,baseMetadata
+,authenticate
+,defaultProfile
+,baseSources
+,getPublications
+,getProfile
+,getProfileByHandle
+,getChallenge} 
+from '@/plugins/lens_api'
+
 import LENS_ABI from '@/plugins/lens_abi'
 
 export const APIURL = "https://api.lens.dev"
 export const STORAGE_KEY = "LH_STORAGE_KEY"
 import { create } from 'ipfs-http-client'
+import { hidePublication } from './lens_api'
 const ipfs_client = create('https://ipfs.infura.io:5001/api/v0')
 export const basicClient = new createClient({url: APIURL})
 
@@ -119,8 +131,8 @@ export default ({ app,store,route }, inject) => {
           if (!token) return
           try {
             const authData = await basicClient.mutation(refresh, {refreshToken: token.refreshToken}).toPromise()
-
-            if (!authData.data) return
+       
+            if (!authData.data)return
 
             const { accessToken, refreshToken } = authData.data.refresh
             const exp = this.parseJwt(refreshToken).exp
@@ -134,14 +146,51 @@ export default ({ app,store,route }, inject) => {
             console.log('error:', err)
           }
         },
-        async getProfileByHandle(input,wallet) {
+        async hidePublication(post_id){
+          const urqlClient = await this.createClient()
+          const result = await urqlClient.mutation(hidePublication, { id: post_id}).toPromise()
+          window.location.reload()
+        },
+        async  signIn(reload=false) {
+          try {
+                  
+            await this.checkMatic()
+            const accounts = await window.ethereum.send( "eth_requestAccounts" )
+            const account = accounts.result[0]
+            console.log('paso1',account)
+            const urqlClient = await this.createClient()
+            console.log('paso2',urqlClient)
+            const response = await urqlClient.query(getChallenge, {address: account }).toPromise()
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner()
+            const signature = await signer.signMessage(response.data.challenge.text)
+            const authData = await urqlClient.mutation(authenticate, {address: account, signature}).toPromise()
+    
+            const { accessToken, refreshToken } = authData.data.authenticate
+            const accessTokenData = this.parseJwt(accessToken)
+
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify({accessToken, refreshToken, exp: accessTokenData.exp}))
+
+            if(reload)window.location.reload()
+          } catch (err) {
+            console.log('error: ', err)
+          }
+        },
+        async isLogged(){
+
+          const accounts = await window.ethereum.send( "eth_requestAccounts" )
+          const account = accounts.result[0]
+          return account
+        },
+        async getProfileByHandle(input) {
+          //if(!this.isLogged())return
           try {
             input=input.toString()
             const urqlClient = await this.createClient()
             let query=input.includes('lens')?getProfileByHandle:input.includes('0x')?getProfile:input=='default'?defaultProfile:''
             let params=input.includes('lens')?{handle: input }:input.includes('0x')?{id: input }:input=='default'?{request:{ethereumAddress: store.state.wallet}}:{}
-    
             let dd = await urqlClient.query(query,params).toPromise()
+            if(!dd.data)return {publications:null,profile:null}
             let profile=dd.data.defaultProfile?dd.data.defaultProfile:dd.data.profile
             const pub = await urqlClient.query(getPublications, { id: profile.id ,sources:baseSources}).toPromise()
             let pubs=pub.data.publications.items
@@ -155,16 +204,13 @@ export default ({ app,store,route }, inject) => {
           if (storageData) {
             try {
               const { accessToken } = await this.refreshAuthToken()
-              const urqlClient = new createUrqlClient({
+              const urqlClient = new createClient({
                 url: APIURL,
-                fetchOptions: {
-                  headers: {
-                    'x-access-token': `Bearer ${accessToken}`
-                  },
-                },
+                fetchOptions: {headers: {'x-access-token': `Bearer ${accessToken}`}},
               })
               return urqlClient
             } catch (err) {
+              console.log(err)
               return basicClient
             }
           } else {
