@@ -10,7 +10,7 @@
             <span>{{profile.name}} - @{{profile.handle}}</span>
             <span>{{profile.bio}}</span>
           </div>
-          <h5 v-if="pubs && pubs.lenght>0" style="margin-top:20px;text-aling:center">Stories</h5>
+          <h5 v-if="pubs && pubs.length>0" style="margin-top:20px;text-aling:center">Stories</h5>
           <h5 v-else style="margin-top:20px;text-aling:center">No stories yet</h5>
           <div  v-for="(pub,index) in pubs" :key="pub.id"> <Pub :pub="pub" /> </div>
         </template>

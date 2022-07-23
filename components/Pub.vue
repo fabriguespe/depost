@@ -5,7 +5,7 @@
             <h3 class="hand" @click="gotoPost(post.id)">{{truncate(post.metadata.name,80)}}</h3>
             <p class="hand" @click="gotoPost(post.id)">{{removeTags(post.metadata.content)}}</p>
         </div>
-        <img :src='getImage()'/>
+        <img class="lazy" :src='getImage()'  />
         <small class="hand" v-if="isOwner" @click="hide()">Hide</small>
     </div>
 </template>
