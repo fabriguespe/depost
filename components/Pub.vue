@@ -5,8 +5,11 @@
             <h3 class="hand" @click="gotoPost(post.id)">{{truncate(post.metadata.name,80)}}</h3>
             <p class="hand" @click="gotoPost(post.id)">{{removeTags(post.metadata.content)}}</p>
         </div>
-        <img class="lazy" :src='getImage()'  />
+
+        <div class="imgcolumn" >
+         <img class="lazy" :src='getImage()'  />
         <small class="hand" v-if="isOwner" @click="hide()">Hide</small>
+        </div>
     </div>
 </template>
 
@@ -66,26 +69,49 @@ export default {
 }
 </script>
 <style>
-.post h3{
-    font-weight: 700;
+
+.hand{
+    cursor: pointer
 }
+
+
+
 .post{
     text-align:left;
     max-width: 80%;
     margin: 0 auto;
-    display: flex;
+    display: flex;  align-items: center;
     padding: 20px;
+    vertical-align: middle !important;
     border-bottom: 1px solid #c2c9d6 ;
 }
+
 .post .content{
     width:70%;
 }
-.hand{
-    cursor: pointer
+.post .imgcolumn{
+    width:30%;
+    padding:20px;
 }
-.post img{
-    max-width:10%;
-    margin:0 auto;
-    height: 50%;
+.imgcolumn img{
+    max-width:100%;
+}
+.post h3{
+    font-weight: 700;
+    margin:0px !important;
+}
+@media (max-width: 799px) {
+    .post{
+        padding: 0px;;
+        
+    }
+     .post h3{
+        font-size: 16px;
+     }
+    .post p,
+    .post small{
+        display: none;
+    };
+    
 }
 </style>

@@ -2,8 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container">
       <a class="navbar-brand" href="/">🌿</a>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav mr-auto d-flex flex-row">
           <li class="nav-item active"> <router-link class="nav-link" to="/">Feed</router-link></li>
           <li class="nav-item active"> <router-link class="nav-link" to="/search">Search</router-link></li>
         </ul>
@@ -12,7 +11,7 @@
           <button v-if="!wallet" class="btn btn-outline-secondary" @click="$util.signIn(true)">Login</button>
           <button v-else class="btn btn-outline-secondary" @click="gotoProfile()" >{{wallet.slice(0,8)}}...</button>
         </div>
-      </div>
+     
       </div>
     </nav>
 </template>
@@ -40,6 +39,7 @@ export default {
 }
 </script>
 <style >
+
 .navbar{
   margin-bottom: 40px;
 }
@@ -73,5 +73,9 @@ export default {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
+@media (max-width: 799px) {
+  .navbar-nav li{
+    margin-right: 10px;
+  }
+}
 </style>
