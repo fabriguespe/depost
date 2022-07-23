@@ -35,7 +35,7 @@ export default {
     async latestPosts() {
       try {
         const urqlClient = await this.$util.createClient()
-        const response = await urqlClient.query(explorePublications,{sources:baseSources,limit:10}).toPromise()
+        const response = await urqlClient.query(explorePublications,{sources:baseSources}).toPromise()
         this.pubs=response.data.explorePublications.items
       } catch (err) {
         console.log('error fetching recommended profiles: ', err)

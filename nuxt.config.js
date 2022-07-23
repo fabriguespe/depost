@@ -12,7 +12,8 @@ export default {
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      {rel: 'stylesheet', type: 'text/css', href: 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'}
     ]
   },
   router: {
@@ -25,8 +26,7 @@ export default {
   ],
   plugins: [
     '@/plugins/utils',
-    '@/plugins/medium-editor',
-    '@/plugins/bootstrap-vue',
+    '@/plugins/medium-editor'
   ],
   components: true,
 

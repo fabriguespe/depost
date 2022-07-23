@@ -79,17 +79,16 @@ export default ({ app,store,route }, inject) => {
           return JSON.parse(jsonPayload);
         },
 
-        async  uploadToIPFS(profile,content,title,file) {
+        async  uploadToIPFS(handle,content,title,file) {
           const metaData = {
               content: content,
               name:title,
-              description: `Post by @${profile.handle}`,
+              description: `Post by @${handle}`,
               metadata_id: uuid(),
               media: [{item:await this.getHash(file),type:'image/png'}],
               createdOn: new Date().toISOString(),
               ...baseMetadata
           }
-          console.log(metaData)
           const added = await ipfs_client.add(JSON.stringify(metaData))
           const uri = `https://ipfs.infura.io/ipfs/${added.path}`
           return uri
@@ -105,7 +104,7 @@ export default ({ app,store,route }, inject) => {
           const dd = await urqlClient.query(defaultProfile, {request:{ethereumAddress: wallet }}).toPromise()
           let profile=dd.data.defaultProfile
 
-          const contentURI = await this.uploadToIPFS(profile,content,title,file)
+          const contentURI = await this.uploadToIPFS(profile.handle,content,title,file)
           const contract = new ethers.Contract(LENS_HUB_CONTRACT_ADDRESS,LENS_ABI, this.getSigner())
           try {
             const postData = {
@@ -116,7 +115,6 @@ export default ({ app,store,route }, inject) => {
               referenceModule: '0x0000000000000000000000000000000000000000',
               referenceModuleInitData: []
             }
-            console.log(postData)
             localStorage.removeItem('draft')
             const tx = await contract.post(postData)
             window.location='/'
@@ -148,27 +146,27 @@ export default ({ app,store,route }, inject) => {
         },
         async hidePublication(post_id){
           const urqlClient = await this.createClient()
-          const result = await urqlClient.mutation(hidePublication, { id: post_id}).toPromise()
+          await urqlClient.mutation(hidePublication, { id: post_id}).toPromise()
           window.location.reload()
         },
         async  signIn(reload=false) {
           try {
-                  
+            //We force metamask to switch to MATIC network   
             await this.checkMatic()
             const accounts = await window.ethereum.send( "eth_requestAccounts" )
+            //We get the wallet address
             const account = accounts.result[0]
-            console.log('paso1',account)
             const urqlClient = await this.createClient()
-            console.log('paso2',urqlClient)
+            //We request a refresh token from Lens
             const response = await urqlClient.query(getChallenge, {address: account }).toPromise()
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner()
             const signature = await signer.signMessage(response.data.challenge.text)
             const authData = await urqlClient.mutation(authenticate, {address: account, signature}).toPromise()
-    
             const { accessToken, refreshToken } = authData.data.authenticate
             const accessTokenData = this.parseJwt(accessToken)
 
+            //We saved the tokens in local memory for later use
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify({accessToken, refreshToken, exp: accessTokenData.exp}))
 
             if(reload)window.location.reload()
@@ -183,10 +181,13 @@ export default ({ app,store,route }, inject) => {
           return account
         },
         async getProfileByHandle(input) {
-          //if(!this.isLogged())return
           try {
+            //Let's make sure if a string in case we input and Hex.
             input=input.toString()
             const urqlClient = await this.createClient()
+            //If Id is fabri.lens uses getProfileByHandle
+            //If Id is in Hex format uses getProfile from the docs
+            //If Id is 'default' uses defaultProfile from the docs
             let query=input.includes('lens')?getProfileByHandle:input.includes('0x')?getProfile:input=='default'?defaultProfile:''
             let params=input.includes('lens')?{handle: input }:input.includes('0x')?{id: input }:input=='default'?{request:{ethereumAddress: store.state.wallet}}:{}
             let dd = await urqlClient.query(query,params).toPromise()

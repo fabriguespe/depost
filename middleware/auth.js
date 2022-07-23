@@ -1,5 +1,5 @@
 
-import {  utils,ethers} from 'ethers'
+import {  ethers} from 'ethers'
 
 export default async function ({ store, redirect,app,route }) {
     app.$util.refreshAuthToken()
@@ -9,6 +9,5 @@ export default async function ({ store, redirect,app,route }) {
         store.state.wallet=addresses[0]
     } else {
         store.state.wallet=null
-        //setConnected(false)
     }
 }

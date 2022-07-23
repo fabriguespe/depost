@@ -352,6 +352,7 @@ fragment CommentMirrorOfFields on Comment {
   }
 }
 `;
+
 export const searchPublications = `
 query Search ($sources: [Sources!], $limit: LimitScalar,$query: Search!) {
   search(request: {
