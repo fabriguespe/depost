@@ -27,8 +27,7 @@ export default {
   },
   async mounted(){
 
-    
-    this.latestPosts()
+    await this.latestPosts()
   },
   methods:{
     

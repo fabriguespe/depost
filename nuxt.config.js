@@ -19,6 +19,15 @@ export default {
   router: {
     base: ''
   },
+  build: {
+    extend (config, { isDev, isClient }) {
+       config.node = {
+            fs: 'empty'
+        }
+ 
+       // ....
+    }
+  },
   css: [
     'medium-editor/dist/css/medium-editor.css',
     'vuejs-medium-editor/src/themes/default.css',
@@ -28,10 +37,5 @@ export default {
     '@/plugins/utils',
     '@/plugins/medium-editor'
   ],
-  components: true,
-
-  buildModules: [
-  ],
-  modules: [
-  ]
+  components: true
 }

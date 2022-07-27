@@ -33,7 +33,7 @@ export default ({ app,store,route }, inject) => {
         try {
             const uploadResult = await ipfs_client.add(file)
             let uri=`https://ipfs.io/ipfs/${uploadResult.path}`
-            console.log(uri)
+         
             return uri
         } catch(e) {
             console.log(e)
@@ -180,7 +180,17 @@ export default ({ app,store,route }, inject) => {
           const account = accounts.result[0]
           return account
         },
-        async getProfileByHandle(input) {
+        async getPublicationsByHandle(profile_id) {
+          try {
+            const urqlClient = await this.createClient()
+            const pub = await urqlClient.query(getPublications, { id: profile_id ,sources:baseSources}).toPromise()
+            let pubs=pub.data.publications.items
+            return pubs
+          } catch (err) {
+            console.log('error fetching profile...', err)
+          }
+        },
+        async getProfileByHandle(input='default') {
           try {
             //Let's make sure if a string in case we input and Hex.
             input=input.toString()
@@ -192,10 +202,8 @@ export default ({ app,store,route }, inject) => {
             let params=input.includes('lens')?{handle: input }:input.includes('0x')?{id: input }:input=='default'?{request:{ethereumAddress: store.state.wallet}}:{}
             let dd = await urqlClient.query(query,params).toPromise()
             if(!dd.data)return {publications:null,profile:null}
-            let profile=dd.data.defaultProfile?dd.data.defaultProfile:dd.data.profile
-            const pub = await urqlClient.query(getPublications, { id: profile.id ,sources:baseSources}).toPromise()
-            let pubs=pub.data.publications.items
-            return {publications:pubs,profile:profile}
+            let profile=dd.data.defaultProfile?dd.data.defaultProfile:dd.data.profile?dd.data.profile:null
+            return profile
           } catch (err) {
             console.log('error fetching profile...', err)
           }

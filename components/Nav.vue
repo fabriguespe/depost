@@ -5,6 +5,7 @@
         <ul class="navbar-nav mr-auto d-flex flex-row">
           <li class="nav-item active"> <router-link class="nav-link" to="/">Feed</router-link></li>
           <li class="nav-item active"> <router-link class="nav-link" to="/search">Search</router-link></li>
+          <li class="nav-item active"> <router-link class="nav-link" to="/chat">Chat</router-link></li>
         </ul>
         <div class="form-inline my-2 my-lg-0">
           <button class="btn btn-outline-success " style="margin-right:20px;" @click="write()">✍🏻</button>

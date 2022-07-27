@@ -5,11 +5,232 @@ export const LENS_HUB_CONTRACT_ADDRESS = "0xDb46d1Dc155634FbC732f92E853b10B288AD
 const APIURL = "https://api.lens.dev"
 
 export const client = new createClient({ url: APIURL})
+
 export const hidePublication = `
 mutation HidePublication ($id: InternalPublicationId!){
   hidePublication(request: { publicationId: $id })
 }
 `
+
+export const doesFollow = `
+  query($request: DoesFollowRequest!) {
+    doesFollow(request: $request) { 
+      followerAddress
+      profileId
+      follows
+    }
+  }
+`
+export const getFollowers = `
+  query($request: FollowersRequest!) {
+    followers(request: $request) { 
+             items {
+        wallet {
+          address
+          defaultProfile {
+            id
+            name
+            bio
+            handle
+                        followNftAddress
+                        metadata
+            picture {
+              ... on NftImage {
+                contractAddress
+                tokenId
+                uri
+                verified
+              }
+              ... on MediaSet {
+                original {
+                  url
+                  mimeType
+                }
+              }
+            }
+            coverPicture {
+              ... on NftImage {
+                contractAddress
+                tokenId
+                uri
+                verified
+              }
+              ... on MediaSet {
+                original {
+                  url
+                  mimeType
+                }
+              }
+            }
+            ownedBy
+            dispatcher {
+              address
+              canUseRelay
+            }
+            stats {
+              totalFollowers
+              totalFollowing
+              totalPosts
+              totalComments
+              totalMirrors
+              totalPublications
+              totalCollects
+            }
+            followModule {
+              ... on FeeFollowModuleSettings {
+                type
+                contractAddress
+                amount {
+                  asset {
+                    name
+                    symbol
+                    decimals
+                    address
+                  }
+                  value
+                }
+                recipient
+              }
+              ... on ProfileFollowModuleSettings {
+               type
+              }
+              ... on RevertFollowModuleSettings {
+               type
+              }
+            }
+          }
+        }
+        totalAmountOfTimesFollowed
+      }
+      pageInfo {
+        prev
+        next
+        totalCount
+      }
+        }
+  }
+`
+
+export const getFollowing = `
+  query($request: FollowingRequest!) {
+    following(request: $request) { 
+        items {
+           profile {
+              id
+              name
+              bio
+              handle
+                            attributes {
+                displayType
+                traitType
+                key
+                value
+              }
+                            followNftAddress
+                            metadata
+              picture {
+                ... on NftImage {
+                  contractAddress
+                  tokenId
+                  uri
+                  verified
+                }
+                ... on MediaSet {
+                  original {
+                    url
+                    width
+                    height
+                    mimeType
+                  }
+                  medium {
+                    url
+                    width
+                    height
+                    mimeType
+                  }
+                  small {
+                    url
+                    width
+                    height
+                    mimeType
+                  }
+                }
+              }
+              coverPicture {
+                ... on NftImage {
+                  contractAddress
+                  tokenId
+                  uri
+                  verified
+                }
+                ... on MediaSet {
+                  original {
+                    url
+                    width
+                    height
+                    mimeType
+                  }
+                  small {
+                    width
+                    url
+                    height
+                    mimeType
+                  }
+                  medium {
+                    url
+                    width
+                    height
+                    mimeType
+                  }
+                }
+              }
+              ownedBy
+              dispatcher {
+                address
+                canUseRelay
+              }
+              stats {
+                totalFollowers
+                totalFollowing
+                totalPosts
+                totalComments
+                totalMirrors
+                totalPublications
+                totalCollects
+              }
+              followModule {
+                ... on FeeFollowModuleSettings {
+                  type
+                  amount {
+                    asset {
+                      name
+                      symbol
+                      decimals
+                      address
+                    }
+                    value
+                  }
+                  recipient
+               }
+                             ... on ProfileFollowModuleSettings {
+                 type
+               }
+               ... on RevertFollowModuleSettings {
+                 type
+               }
+            }
+          }
+        }
+       pageInfo {
+          prev
+          next
+          totalCount
+       }
+        }
+  }
+`
+
+
 export const explorePublications = `
 query ExplorePublications($sources: [Sources!], $limit: LimitScalar) {
   explorePublications(request: {
@@ -674,6 +895,33 @@ fragment CommentMirrorOfFields on Comment {
   }
 }`
 
+export const createUnfollowTypedData = `
+  mutation($request: UnfollowRequest!) { 
+    createUnfollowTypedData(request: $request) {
+      id
+      expiresAt
+      typedData {
+        domain {
+          name
+          chainId
+          version
+          verifyingContract
+        }
+        types {
+          BurnWithSig {
+            name
+            type
+          }
+        }
+        value {
+          nonce
+          deadline
+          tokenId
+        }
+      }
+    }
+ }
+`
 export const defaultProfile = `
   query($request: DefaultProfileRequest!) {
     defaultProfile(request: $request) {
