@@ -17,7 +17,6 @@
       :show-files="false"
       :show-audio="false"
       :show-add-room="false"
-      :fetch-messages="fetchMessages()"
       @send-message="sendMessage($event)"
 
       
@@ -99,8 +98,7 @@ export default {
     }
   },
   methods:{
-    fetchMessages(){
-    },
+   
     sendMessage(msg){
       const newm={  _id: Math.random(10000),content:msg.content,senderId: this.profile.id  } ;
       this.messages.push(newm)
@@ -131,7 +129,6 @@ export default {
         let him={_id: contact_id,  username: contact_name,avatar:contact_img ,status: { state: 'online'}}
         rooms.push({roomId: contact_id, roomName: contact_name,users: [me,him] })
 
-        
       }
       this.rooms = rooms
       this.rooms_loaded=true
