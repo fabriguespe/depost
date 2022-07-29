@@ -203,12 +203,6 @@ export default {
       }
     },
   },
-  watch:{
-    messages(val){
-      let jeje=val.slice(val.length-8,val.length)
-      console.log(jeje)
-    }
-  },
   components:{
     MyNav,MyFooter,ChatWindow
   }
