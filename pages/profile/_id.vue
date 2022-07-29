@@ -5,7 +5,7 @@
         <div v-if="loading" class="loader"></div>
         <h5  v-else-if="!profile" style="margin-top:20px;text-aling:center">Profile not found, connect</h5>
         <template v-else-if="profile" >
-          <img :src="profile.coverPicture.original.url" style="width:100%;max-height:400px;margin-bottom:20px;"/>
+          <img :src="getCover()" style="width:100%;max-height:300px;margin-bottom:40px;object-fit: cover;"/>
           <div class="container d-flex flex-row" style="">
               <div class="profile d-flex flex-column" style="width:30%;">
                 <img width="100%" style="margin:0 auto;" :src="getImage()"/>
@@ -13,9 +13,10 @@
                 <span>{{profile.bio}}</span>
                 <button v-if="follow" @click="unfollow()">Unfollow</button>
                 <button v-else @click="followUser()">Follow</button>
+                <a style="border:0px;margin-top:20px;font-size:10px;" target="_blank" :href="'https://www.lensfrens.xyz/'+profile.handle" >Edit profile</a>
               </div>
               <div class="pubs " style="width:70%;">
-                <h5 v-if="!publications" style="margin-top:20px;text-aling:center">No stories yet</h5>
+                <h5 v-if="!publications || publications.length==0" style="margin-top:20px;text-aling:center">No posts yet</h5>
                 <div  v-for="(pub,index) in publications" :key="pub.id"> <Pub :pub="pub" /> </div>
               </div>
           </div>
@@ -45,12 +46,15 @@ export default {
         }
   },
   async mounted(){
-    
-    let id=this.$route.params.id
-    this.profile=await this.$util.getProfileByHandle(id)
-    this.publications=await this.$util.getPublicationsByHandle(this.profile.id)
-    this.loading=false
-    this.checkDoesFollow()
+    try{
+      let id=this.$route.params.id
+      this.profile=await this.$util.getProfile(id)
+      this.publications=await this.$util.getPublicationsByHandle(this.profile.id)
+      this.loading=false
+      this.checkDoesFollow()
+    }catch(e){
+      console.log(e)
+    }
   },
   methods:{
       async  unfollow() {
@@ -79,6 +83,13 @@ export default {
         } catch (err) {
           console.log('error: ', err)
         }
+      },
+
+      getCover(){
+        if(this.profile && this.profile.coverPicture){
+          return this.profile.coverPicture.original.url
+        }
+        else return "https://pbs.twimg.com/profile_images/1490782523701481474/DtyJ_8ej_400x400.jpg"
       },
       getImage(){
         if(this.profile && this.profile.picture){

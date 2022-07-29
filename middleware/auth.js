@@ -3,6 +3,7 @@ import {  ethers} from 'ethers'
 
 export default async function ({ store, redirect,app,route }) {
     try{
+        store.commit('initialiseStore');
         app.$util.refreshAuthToken()
         const provider = new ethers.providers.Web3Provider((window).ethereum )
         const addresses = await provider.listAccounts();

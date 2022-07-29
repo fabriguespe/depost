@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { createClient } from 'urql'
 import { refresh } from '@/plugins/lens_api'
 import {  utils,ethers} from 'ethers'
+import { Client } from '@xmtp/xmtp-js'
 import { 
 LENS_HUB_CONTRACT_ADDRESS
 ,baseMetadata
@@ -12,7 +13,9 @@ LENS_HUB_CONTRACT_ADDRESS
 ,getPublications
 ,getProfile
 ,getProfileByHandle
-,getChallenge} 
+,getChallenge
+,hidePublication
+,getProfileByWallet} 
 from '@/plugins/lens_api'
 
 import LENS_ABI from '@/plugins/lens_abi'
@@ -20,7 +23,6 @@ import LENS_ABI from '@/plugins/lens_abi'
 export const APIURL = "https://api.lens.dev"
 export const STORAGE_KEY = "LH_STORAGE_KEY"
 import { create } from 'ipfs-http-client'
-import { hidePublication } from './lens_api'
 const ipfs_client = create('https://ipfs.infura.io:5001/api/v0')
 export const basicClient = new createClient({url: APIURL})
 
@@ -93,9 +95,17 @@ export default ({ app,store,route }, inject) => {
           const uri = `https://ipfs.infura.io/ipfs/${added.path}`
           return uri
         },
+        async getXMTP(){
+          if(store.state.xmtp)return store.state.xmtp
+          let xmtp=await Client.create(this.getSigner())
+          store.state.xmtp=xmtp
+          return xmtp
+        },
         getSigner() {
+          if(store.state.signer)return store.state.signer
           const provider = new ethers.providers.Web3Provider(window.ethereum)
-          return provider.getSigner();
+          store.state.signer=provider.getSigner()
+          return store.state.signer
         },
         async  savePost(content,title,file) {
           let wallet=store.state.wallet
@@ -182,27 +192,34 @@ export default ({ app,store,route }, inject) => {
         },
         async getPublicationsByHandle(profile_id) {
           try {
+            if(!profile_id)return null
             const urqlClient = await this.createClient()
             const pub = await urqlClient.query(getPublications, { id: profile_id ,sources:baseSources}).toPromise()
+       
             let pubs=pub.data.publications.items
             return pubs
           } catch (err) {
             console.log('error fetching profile...', err)
           }
         },
-        async getProfileByHandle(input='default') {
+        async getProfile(input='default') {
           try {
+            if(!input)return null
+            //It it 's in the store cache, returns it
+            if(store.state.profile)return store.state.profile
             //Let's make sure if a string in case we input and Hex.
             input=input.toString()
             const urqlClient = await this.createClient()
             //If Id is fabri.lens uses getProfileByHandle
             //If Id is in Hex format uses getProfile from the docs
             //If Id is 'default' uses defaultProfile from the docs
-            let query=input.includes('lens')?getProfileByHandle:input.includes('0x')?getProfile:input=='default'?defaultProfile:''
-            let params=input.includes('lens')?{handle: input }:input.includes('0x')?{id: input }:input=='default'?{request:{ethereumAddress: store.state.wallet}}:{}
+            let query=input.includes('lens')?getProfileByHandle:input.includes('0x')?getProfile:input=='default'?getProfileByWallet:''
+            let params=input.includes('lens')?{handle: input }:input.includes('0x')?{id: input }:input=='default'?{id: store.state.wallet}:{}
             let dd = await urqlClient.query(query,params).toPromise()
             if(!dd.data)return {publications:null,profile:null}
-            let profile=dd.data.defaultProfile?dd.data.defaultProfile:dd.data.profile?dd.data.profile:null
+            //Brings first profile by default
+            let profile=dd.data.profiles?dd.data.profiles.items[0]:dd.data.profile?dd.data.profile:null
+            store.state.profile=profile
             return profile
           } catch (err) {
             console.log('error fetching profile...', err)
