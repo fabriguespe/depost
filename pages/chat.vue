@@ -18,10 +18,7 @@
       :show-files="false"
       :show-audio="false"
       :show-add-room="false"
-      @send-message="sendMessage($event)"
-
-      
-      />
+      @send-message="sendMessage($event)"/>
       </div>
     <MyFooter/>
   </body>
@@ -29,10 +26,9 @@
 
 
 <script>
+
 import ChatWindow from 'vue-advanced-chat'
-  import 'vue-advanced-chat/dist/vue-advanced-chat.css'
-
-
+import 'vue-advanced-chat/dist/vue-advanced-chat.css'
 import {  getFollowers,getFollowing } from '@/plugins/lens_api'
 import MyNav from '@/components/Nav'
 import MyFooter from '@/components/Footer'
@@ -104,11 +100,9 @@ export default {
    
     async sendMessage(msg){
       msg={  _id: Math.random(10000),senderId: this.wallet,...msg  }
-
       this.messages.push(msg)
       for (const conversation of await this.xmtp.conversations.list()) {
         if(conversation.peerAddress==msg.roomId){
-          //console.log(conversation)
           //Push messages sent and sends it to the xmtp protocol
           await conversation.send(msg.content)
         }
@@ -145,8 +139,8 @@ export default {
           let contact_img=contact.picture?contact.picture.original.url:''
           let contact_name=contact.name?contact.name:contact.ownedBy
           let him={_id: contact_id,  username: contact_name,avatar:contact_img ,status: { state: 'online'}}
-          //console.log(me,him)
             
+          //We first verify if the wallet is already in XMTP, if not, we can't initiate a conversation.
           if(await this.xmtp.getUserContact(contact_id)){
             //Creates a room and a conversation for every contact that exists in XMTP.
             //By existing i mean that sign an xmtp message at least once
